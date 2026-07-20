@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MemeCraft Code - IA para sistemas y reversing</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0c10;color:#e8eaed;line-height:1.6;overflow-x:hidden}
+::selection{background:#00aaff33;color:#fff}
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* NAV */
+nav{display:flex;align-items:center;gap:24px;padding:16px 0;border-bottom:1px solid #1e2030;flex-wrap:wrap}
+nav .logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;letter-spacing:-.5px}
+nav .logo img{width:32px;height:32px;border-radius:8px}
+nav .logo span{color:#00aaff}
+nav .nav-links{margin-left:auto;display:flex;gap:20px;align-items:center}
+nav .nav-links a{color:#8b8fa3;text-decoration:none;font-size:13px;font-weight:500;transition:color .15s}
+nav .nav-links a:hover{color:#e8eaed}
+.btn-outline{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid #2a2d3a;color:#e8eaed;transition:all .15s}
+.btn-outline:hover{background:#1c1e26;border-color:#00aaff}
+
+/* HERO */
+.hero{text-align:center;padding:100px 0 60px;position:relative}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(0,170,255,.05) 0%,rgba(100,50,255,.03) 40%,transparent 70%);pointer-events:none}
+.hero .tag{display:inline-flex;align-items:center;gap:6px;background:rgba(0,170,255,.1);border:1px solid rgba(0,170,255,.2);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:#00aaff;margin-bottom:24px}
+.hero h1{font-size:56px;font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,#fff 30%,#00aaff 70%,#8866ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:18px;color:#8b8fa3;max-width:600px;margin:0 auto 32px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;background:#00aaff;color:#fff;border:none;cursor:pointer;transition:all .15s}
+.btn-primary:hover{background:#0090dd;transform:translateY(-1px)}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;background:#1c1e26;color:#e8eaed;border:1px solid #2a2d3a;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{background:#252833;border-color:#00aaff;transform:translateY(-1px)}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;color:#8b8fa3;border:none;cursor:pointer;transition:all .15s}
+.btn-ghost:hover{color:#e8eaed}
+
+/* APP MOCKUP */
+.mockup-section{text-align:center;padding:20px 0 80px}
+.mockup-wrap{position:relative;display:inline-block;max-width:900px;width:100%;border-radius:12px;border:1px solid #1e2030;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,.5);background:#0d0e12}
+.mockup-wrap .topbar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#14151a;border-bottom:1px solid #1e2030;font-size:12px;color:#5c5f73}
+.mockup-wrap .topbar .dots{display:flex;gap:6px;margin-right:12px}
+.mockup-wrap .topbar .dots span{width:10px;height:10px;border-radius:50%}
+.mockup-wrap .topbar .dots .r{background:#ff5f56}
+.mockup-wrap .topbar .dots .y{background:#ffbd2e}
+.mockup-wrap .topbar .dots .g{background:#27c93f}
+.mockup-wrap .topbar .badge{background:#1c1e26;padding:3px 10px;border-radius:4px;color:#00aaff;border:1px solid #2a2d3a;cursor:pointer}
+.mockup-wrap .topbar .right{margin-left:auto;display:flex;gap:6px}
+.mockup-wrap .topbar .right span{background:#1c1e26;padding:3px 8px;border-radius:4px;color:#5c5f73}
+.mockup-body{display:flex;min-height:380px}
+.mockup-body .sidebar{width:200px;background:#14151a;border-right:1px solid #1e2030;padding:12px;text-align:left;flex-shrink:0}
+.mockup-body .sidebar .section{font-size:9px;color:#5c5f73;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.mockup-body .sidebar .item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:4px;font-size:11px;color:#8b8fa3;margin-bottom:2px}
+.mockup-body .sidebar .item.active{background:rgba(0,170,255,.08);color:#00aaff}
+.mockup-body .sidebar .item .dot{width:6px;height:6px;border-radius:50%;background:#00aaff}
+.mockup-body .sidebar .item .tag{font-size:7px;padding:1px 4px;border-radius:2px;margin-left:auto}
+.mockup-body .chat{flex:1;display:flex;flex-direction:column;padding:16px;text-align:left}
+.mockup-body .chat .msg{max-width:80%;padding:8px 12px;border-radius:6px;font-size:12px;line-height:1.5;margin-bottom:8px}
+.mockup-body .chat .msg.user{background:#1c1e26;align-self:flex-end;border-bottom-right-radius:2px}
+.mockup-body .chat .msg.ai{background:#14151a;border:1px solid #1e2030;align-self:flex-start;border-bottom-left-radius:2px}
+.mockup-body .chat .msg .label{font-size:9px;color:#5c5f73;margin-bottom:2px}
+.mockup-body .chat .msg code{background:#0d0e12;padding:1px 4px;border-radius:3px;font-size:11px;color:#00c864}
+.mockup-body .chat .input-row{display:flex;gap:6px;margin-top:auto;padding-top:12px}
+.mockup-body .chat .input-row .field{flex:1;background:#14151a;border:1px solid #1e2030;border-radius:6px;padding:8px 12px;font-size:12px;color:#5c5f73}
+.mockup-body .chat .input-row .send{background:#00aaff22;border:1px solid #00aaff44;border-radius:6px;padding:8px 14px;font-size:12px;color:#00aaff;cursor:pointer}
+
+/* MOCKUP GRID */
+.mockup-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:60px 0}
+@media(max-width:700px){.mockup-grid{grid-template-columns:1fr}}
+.mockup-sm{background:#0d0e12;border:1px solid #1e2030;border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.4);text-align:left}
+.mockup-sm .head{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#14151a;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73}
+.mockup-sm .head .dots{display:flex;gap:4px;margin-right:8px}
+.mockup-sm .head .dots span{width:8px;height:8px;border-radius:50%}
+.mockup-sm .body{padding:14px}
+.mockup-sm .body .row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:11px;margin-bottom:4px}
+.mockup-sm .body .row:hover{background:#14151a}
+.mockup-sm .body .row img{width:20px;height:20px;border-radius:4px}
+.mockup-sm .body .row .info{flex:1}
+.mockup-sm .body .row .info .nm{font-weight:600;font-size:11px}
+.mockup-sm .body .row .info .ds{font-size:9px;color:#5c5f73}
+.mockup-sm .body .row .key{font-size:8px;color:#5c5f73;background:#0d0e12;padding:2px 5px;border-radius:3px;border:1px solid #1e2030}
+.mockup-sm .body .field{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#14151a;border:1px solid #1e2030;border-radius:6px;margin-bottom:8px;font-size:11px;color:#5c5f73}
+.mockup-sm .body .field .lab{width:60px;color:#8b8fa3;font-size:10px}
+.mockup-sm .body .field .val{flex:1;color:#e8eaed}
+.mockup-sm .body .btn-mock{background:#00aaff;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;display:inline-block}
+
+/* FEATURES */
+.section-title{text-align:center;font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-1px}
+.section-sub{text-align:center;color:#8b8fa3;font-size:15px;margin-bottom:48px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:80px}
+@media(max-width:800px){.features{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.features{grid-template-columns:1fr}}
+.feature-card{background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px;transition:all .2s}
+.feature-card:hover{border-color:#2a2d3a;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.feature-card .icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.feature-card h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.feature-card p{font-size:13px;color:#8b8fa3;line-height:1.5}
+
+/* MODELS */
+.models-section{padding:60px 0;margin-bottom:60px;border-top:1px solid #1e2030;border-bottom:1px solid #1e2030}
+.models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:32px}
+.model-card{background:#111318;border:1px solid #1e2030;border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px;transition:all .15s}
+.model-card:hover{border-color:#2a2d3a;background:#14151a}
+.model-card .mlogo{width:28px;height:28px;border-radius:6px;flex-shrink:0;object-fit:contain}
+.model-card .minfo{flex:1;min-width:0}
+.model-card .minfo .mname{font-size:12px;font-weight:600;line-height:1.2}
+.model-card .minfo .mdesc{font-size:10px;color:#5c5f73;line-height:1.3}
+.model-card .mtag{font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.3px;flex-shrink:0}
+
+/* SHORTCUTS */
+.shortcuts-showcase{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:32px 0 60px}
+.shortcuts-showcase .sc-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#111318;border:1px solid #1e2030;border-radius:8px;font-size:12px}
+.shortcuts-showcase .sc-item .key{font-size:11px;color:#5c5f73;background:#0d0e12;padding:2px 8px;border-radius:4px;border:1px solid #1e2030;font-weight:600}
+
+/* DOWNLOAD */
+.download-section{padding:60px 0 80px}
+.download-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:32px}
+@media(max-width:600px){.download-grid{grid-template-columns:1fr}}
+.dl-card{background:#111318;border:1px solid #1e2030;border-radius:12px;padding:28px;text-align:center;transition:all .2s}
+.dl-card:hover{border-color:#2a2d3a;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.dl-card .os-icon{font-size:32px;margin-bottom:12px}
+.dl-card h3{font-size:17px;font-weight:600;margin-bottom:4px}
+.dl-card p{font-size:13px;color:#8b8fa3;margin-bottom:16px}
+.dl-card .meta{font-size:11px;color:#5c5f73;margin-bottom:16px}
+.dl-card .btn-primary{width:100%;justify-content:center}
+
+/* CHANGELOG */
+.changelog{background:#111318;border:1px solid #1e2030;border-radius:12px;padding:32px;margin:60px 0}
+.changelog h3{font-size:18px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.changelog ul{list-style:none}
+.changelog li{padding:8px 0;font-size:13px;color:#c9d1d9;border-bottom:1px solid #1e2030;display:flex;gap:8px}
+.changelog li:last-child{border-bottom:none}
+.changelog li .ver{color:#00aaff;font-weight:600;flex-shrink:0;width:60px}
+
+/* FOOTER */
+footer{text-align:center;padding:40px 0;border-top:1px solid #1e2030}
+footer .social{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
+footer .social a{color:#5c5f73;text-decoration:none;font-size:13px;transition:color .15s}
+footer .social a:hover{color:#e8eaed}
+footer p{color:#5c5f73;font-size:12px}
+footer a{color:#00aaff;text-decoration:none}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .hero h1{font-size:32px}
+  .hero p{font-size:15px}
+  .hero{padding:60px 0 40px}
+  .mockup-body .sidebar{display:none}
+  .mockup-body .chat{min-height:250px}
+  .features{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="container">
+  <div class="logo">
+    <img src="Imagenes/Logo.png" alt="MemeCraft Code">
+    MemeCraft<span>Code</span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Caracteristicas</a>
+    <a href="#modelos">Modelos</a>
+    <a href="#descargas">Descargar</a>
+    <a href="https://github.com/bddjf00-cell/MemecraftIA" target="_blank" class="btn-outline">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="tag">✨ v1.0.23 — 13 modelos IA · Gratis · Open Source</div>
+  <h1>La IA definitiva para<br>sistemas y reversing</h1>
+  <p>Asistente potente para programacion de sistemas, memoria, procesos, debugging y herramientas para juegos. Sin restricciones, sin limites.</p>
+  <div class="hero-btns">
+    <a href="#descargas" class="btn-primary">⬇ Descargar gratis</a>
+    <a href="#features" class="btn-secondary">Ver caracteristicas</a>
+    <a href="https://github.com/bddjf00-cell/MemecraftIA" class="btn-ghost" target="_blank">GitHub →</a>
+  </div>
+</section>
+
+<!-- MOCKUP PRINCIPAL -->
+<section class="mockup-section container">
+  <div class="mockup-wrap">
+    <div class="topbar">
+      <div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+      <span class="badge" title="Click para cambiar modelo">Llama 3.1 8B ★</span>
+      <div class="right"><span title="API Key">🔑</span><span title="Buscar">🔍</span><span title="Menu">☰</span></div>
+    </div>
+    <div class="mockup-body">
+      <div class="sidebar">
+        <div class="section">Modelos</div>
+        <div class="item active"><div class="dot"></div> Llama 3.1 8B <span class="tag" style="color:#00c864">Flash</span></div>
+        <div class="item"><div class="dot" style="background:#8b8fa3"></div> DeepSeek Flash <span class="tag" style="color:#00c864">Flash</span></div>
+        <div class="item"><div class="dot" style="background:#8b8fa3"></div> DeepSeek Pro <span class="tag" style="color:#ffb400">Think</span></div>
+        <div class="item"><div class="dot" style="background:#8b8fa3"></div> Qwen 3.5 397B <span class="tag" style="color:#cc66ff">Ultra</span></div>
+        <div class="item"><div class="dot" style="background:#8b8fa3"></div> Nemotron Super <span class="tag" style="color:#ffb400">Think</span></div>
+        <div style="margin-top:16px"><div class="section">Proyecto</div></div>
+        <div class="item">📁 Cargar proyecto</div>
+        <div class="item">📄 Abrir archivo</div>
+        <div style="margin-top:16px"><div class="section">Acciones</div></div>
+        <div class="item">📤 Exportar TXT</div>
+        <div class="item">🗑️ Limpiar chat</div>
+      </div>
+      <div class="chat">
+        <div class="msg ai">
+          <div class="label">Programmer · Llama 3.1 8B ★</div>
+          Listo! Dame el codigo, los offsets, o la firma AOB que necesitas analizar. Te ayudo con reversing, debugging, parches y herramientas de memoria.
+        </div>
+        <div class="msg user">
+          <div class="label">Programmer · Llama 3.1 8B ★</div>
+          Analiza este patron AOB: 48 8B 05 ?? ?? ?? ?? 48 85 C0 74 0A
+        </div>
+        <div class="msg ai">
+          <div class="label">Programmer · Llama 3.1 8B ★</div>
+          Analizando el patron AOB... Es un acceso tipico a variable global en x64. <code>mov rax, [rip+offset]</code> seguido de <code>test rax, rax</code> y <code>je</code> indica un puntero a estructura global...
+        </div>
+        <div class="input-row">
+          <div class="field">Escribe tu mensaje...</div>
+          <div class="send">Enviar →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI CAPABILITIES -->
+<div class="container" style="margin-bottom:60px">
+  <h2 class="section-title">Lo que la IA puede hacer</h2>
+  <p class="section-sub">Reversing, debugging, memoria, codigo y mucho mas</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <!-- AOB ANALYSIS -->
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 16px;background:#0d0e12;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73;font-weight:600">🔍 Analisis de patrones AOB</div>
+      <div style="padding:16px">
+        <div style="background:#0d0e12;border:1px solid #1e2030;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;line-height:1.6;margin-bottom:12px;color:#00c864">
+<span style="color:#8b8fa3">// Patron AOB encontrado en memory.dump</span><br>
+48 8B 05 <span style="color:#ffb400">?? ?? ?? ??</span> 48 85 C0 74 0A<br>
+48 8B 40 10 48 85 C0 74 03<br>
+FF 60 48 CC 90 90 90
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="background:rgba(0,170,255,.08);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00aaff;flex-shrink:0">IA</div>
+          <div style="font-size:11px;color:#8b8fa3;line-height:1.5">El patron <code style="background:#0d0e12;padding:1px 4px;border-radius:3px;font-size:10px;color:#e8eaed">48 8B 05 ?? ?? ?? ??</code> es un <strong style="color:#e8eaed">mov rax, [rip+offset]</strong> tipico de acceso a variable global en x64. Los bytes <code style="background:#0d0e12;padding:1px 4px;border-radius:3px;font-size:10px">48 85 C0 74 0A</code> son un <strong style="color:#e8eaed">test rax, rax / je</strong> que verifica si el puntero es nulo. Esto suele ser una estructura global como <code style="background:#0d0e12;padding:1px 4px;border-radius:3px;font-size:10px">g_pGameManager</code> o similar.</div>
+        </div>
+      </div>
+    </div>
+    <!-- MEMORY HACK -->
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 16px;background:#0d0e12;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73;font-weight:600">🧠 Modificacion de memoria</div>
+      <div style="padding:16px">
+        <div style="background:#0d0e12;border:1px solid #1e2030;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;line-height:1.5;margin-bottom:12px">
+<span style="color:#8b8fa3">// C++ - WriteProcessMemory example</span><br>
+<span style="color:#7c3aed">DWORD</span> pid = GetProcessIdByName(<span style="color:#00c864">"game.exe"</span>);<br>
+<span style="color:#7c3aed">HANDLE</span> hProc = OpenProcess(PROCESS_ALL_ACCESS, <span style="color:#7c3aed">FALSE</span>, pid);<br>
+<span style="color:#7c3aed">int</span> newHP = <span style="color:#ffb400">99999</span>;<br>
+WriteProcessMemory(hProc, addr, &newHP, <span style="color:#7c3aed">sizeof</span>(newHP), &written);
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="background:rgba(0,170,255,.08);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00aaff;flex-shrink:0">IA</div>
+          <div style="font-size:11px;color:#8b8fa3;line-height:1.5">Codigo completo para modificar memoria de un proceso. Incluye <strong style="color:#e8eaed">GetProcessIdByName</strong>, <strong style="color:#e8eaed">OpenProcess</strong> con permisos totales y <strong style="color:#e8eaed">WriteProcessMemory</strong>. El codigo busca el proceso por nombre, obtiene su PID, abre un handle y escribe el nuevo valor en la direccion especificada.</div>
+        </div>
+      </div>
+    </div>
+    <!-- DLL INJECTION -->
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 16px;background:#0d0e12;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73;font-weight:600">💉 Inyeccion DLL</div>
+      <div style="padding:16px">
+        <div style="background:#0d0e12;border:1px solid #1e2030;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;line-height:1.5;margin-bottom:12px">
+<span style="color:#8b8fa3">// C++ - DLL Injection via CreateRemoteThread</span><br>
+LPVOID remoteMem = VirtualAllocEx(hProc, <span style="color:#7c3aed">NULL</span>, dllPath.Size(), MEM_COMMIT, PAGE_READWRITE);<br>
+WriteProcessMemory(hProc, remoteMem, dllPath, dllPath.Size(), &written);<br>
+LPVOID loadLib = GetProcAddress(GetModuleHandle(<span style="color:#00c864">"kernel32.dll"</span>), <span style="color:#00c864">"LoadLibraryA"</span>);<br>
+CreateRemoteThread(hProc, <span style="color:#7c3aed">NULL</span>, <span style="color:#ffb400">0</span>, loadLib, remoteMem, <span style="color:#ffb400">0</span>, <span style="color:#7c3aed">NULL</span>);
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="background:rgba(0,170,255,.08);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00aaff;flex-shrink:0">IA</div>
+          <div style="font-size:11px;color:#8b8fa3;line-height:1.5">Inyeccion DLL clasica via <strong style="color:#e8eaed">CreateRemoteThread</strong>. Reserva memoria en el proceso remoto, escribe la ruta de la DLL, obtiene la direccion de <strong style="color:#e8eaed">LoadLibraryA</strong> y crea un hilo remoto que la carga. Incluye manejo de errores y espera de hilo.</div>
+        </div>
+      </div>
+    </div>
+    <!-- CODE GENERATION -->
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 16px;background:#0d0e12;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73;font-weight:600">⚡ Generacion de codigo completo</div>
+      <div style="padding:16px">
+        <div style="background:#0d0e12;border:1px solid #1e2030;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;line-height:1.5;margin-bottom:12px">
+<span style="color:#8b8fa3"># Python - Memory scanner with pattern matching</span><br>
+<span style="color:#7c3aed">def</span> <span style="color:#ffb400">scan_pattern</span>(pid, pattern):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;regions = get_memory_regions(pid)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7c3aed">for</span> base, size <span style="color:#7c3aed">in</span> regions:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data = read_process_memory(pid, base, size)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results = aob_scan(data, pattern)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7c3aed">if</span> results: <span style="color:#7c3aed">return</span> [(base + off) <span style="color:#7c3aed">for</span> off <span style="color:#7c3aed">in</span> results]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7c3aed">return</span> []
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="background:rgba(0,170,255,.08);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00aaff;flex-shrink:0">IA</div>
+          <div style="font-size:11px;color:#8b8fa3;line-height:1.5">Genera codigo COMPLETO en C++, C#, Python, Rust, Go y mas. Sin "...", sin "resto del codigo". Cada respuesta incluye <strong style="color:#e8eaed">analisis detallado</strong> explicando como funciona cada parte del codigo generado.</div>
+        </div>
+      </div>
+    </div>
+    <!-- ESP GLOW -->
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 16px;background:#0d0e12;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73;font-weight:600">🎨 Colores ESP y efectos visuales</div>
+      <div style="padding:16px">
+        <div style="background:#0d0e12;border:1px solid #1e2030;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;line-height:1.5;margin-bottom:12px">
+<span style="color:#8b8fa3">// C++ - ESP Box via D3D9/11 overlay</span><br>
+<span style="color:#7c3aed">void</span> DrawESPBox(Vector2 head, Vector2 feet, <span style="color:#7c3aed">D3DCOLOR</span> color) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7c3aed">float</span> h = feet.y - head.y;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#7c3aed">float</span> w = h * <span style="color:#ffb400">0.5f</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;DrawBorderBox(head.x - w/<span style="color:#ffb400">2</span>, head.y, w, h, <span style="color:#ffb400">2.0f</span>, color);<br>
+}
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="background:rgba(0,170,255,.08);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00aaff;flex-shrink:0">IA</div>
+          <div style="font-size:11px;color:#8b8fa3;line-height:1.5">Codigo completo para ESP boxes, glow effects, trazos y overlays via <strong style="color:#e8eaed">DirectX 9/11</strong> o <strong style="color:#e8eaed">OpenGL</strong>. Incluye WorldToScreen, calculo de cabezas/pies, y color personalizado por equipo.</div>
+        </div>
+      </div>
+    </div>
+    <!-- DEBUGGING -->
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;overflow:hidden">
+      <div style="padding:14px 16px;background:#0d0e12;border-bottom:1px solid #1e2030;font-size:11px;color:#5c5f73;font-weight:600">🐛 Debugging y analisis de crashes</div>
+      <div style="padding:16px">
+        <div style="background:#0d0e12;border:1px solid #1e2030;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;line-height:1.5;margin-bottom:12px">
+<span style="color:#8b8fa3">// Crash dump analysis - EXCEPTION_ACCESS_VIOLATION</span><br>
+<span style="color:#8b8fa3">// EIP: 0x0045A2F1 | mov ecx, [eax+0x1C]</span><br>
+<span style="color:#8b8fa3">// EAX: 0x00000000 ← NULL pointer dereference!</span><br><br>
+<span style="color:#7c3aed">if</span> (player && player->GetHealth() > <span style="color:#ffb400">0</span>) {  <span style="color:#5c5f73">// &lt;- Fix: null check</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;player->Update();
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="background:rgba(0,170,255,.08);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00aaff;flex-shrink:0">IA</div>
+          <div style="font-size:11px;color:#8b8fa3;line-height:1.5">Analisis de crash dumps, excepciones, stack traces y errores de memoria. Identifica <strong style="color:#e8eaed">null pointers</strong>, <strong style="color:#e8eaed">buffer overflows</strong>, <strong style="color:#e8eaed">use-after-free</strong> y propone fixes con codigo completo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="container" style="margin-bottom:60px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center">
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px">
+      <div style="font-size:32px;font-weight:800;color:#00aaff;margin-bottom:4px">13</div>
+      <div style="font-size:12px;color:#8b8fa3">Modelos IA</div>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px">
+      <div style="font-size:32px;font-weight:800;color:#00c864;margin-bottom:4px">3</div>
+      <div style="font-size:12px;color:#8b8fa3">Modos de trabajo</div>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px">
+      <div style="font-size:32px;font-weight:800;color:#cc66ff;margin-bottom:4px">99%</div>
+      <div style="font-size:12px;color:#8b8fa3">Codigo funcional</div>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px">
+      <div style="font-size:32px;font-weight:800;color:#ffb400;margin-bottom:4px">∞</div>
+      <div style="font-size:12px;color:#8b8fa3">Sin limites</div>
+    </div>
+  </div>
+</div>
+
+<!-- MOCKUPS ADICIONALES -->
+<div class="container">
+  <h2 class="section-title">Diseñado para productividad</h2>
+  <p class="section-sub">Interfaz limpia, atajos de teclado, selector visual de modelos y API personalizada</p>
+  <div class="mockup-grid">
+    <!-- SELECTOR MODAL -->
+    <div class="mockup-sm">
+      <div class="head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div> Selector de Modelos</div>
+      <div class="body">
+        <div class="row" style="background:rgba(0,170,255,.08)">
+          <img src="https://unpkg.com/@lobehub/icons-static-png@latest/light/meta-color.png" alt="">
+          <div class="info"><div class="nm">Llama 3.1 8B ★</div><div class="ds">Rapido, recomendado</div></div>
+          <span class="key">Ctrl+1</span>
+        </div>
+        <div class="row">
+          <img src="https://unpkg.com/@lobehub/icons-static-png@latest/light/deepseek-color.png" alt="">
+          <div class="info"><div class="nm">DeepSeek V4 Flash</div><div class="ds">Rapido, 4096 tokens</div></div>
+          <span class="key">Ctrl+=</span>
+        </div>
+        <div class="row">
+          <img src="https://unpkg.com/@lobehub/icons-static-png@latest/light/deepseek-color.png" alt="">
+          <div class="info"><div class="nm">DeepSeek V4 Pro</div><div class="ds">Razonamiento profundo</div></div>
+          <span class="key">Ctrl+[</span>
+        </div>
+        <div class="row">
+          <img src="https://unpkg.com/@lobehub/icons-static-png@latest/light/meta-color.png" alt="">
+          <div class="info"><div class="nm">Llama 3.3 70B</div><div class="ds">Preciso, analisis profundo</div></div>
+          <span class="key">Ctrl+2</span>
+        </div>
+        <div class="row">
+          <img src="https://unpkg.com/@lobehub/icons-static-png@latest/light/qwen-color.png" alt="">
+          <div class="info"><div class="nm">Qwen 3.5 397B</div><div class="ds">Maxima potencia</div></div>
+          <span class="key">Ctrl+3</span>
+        </div>
+        <div class="row" style="border-top:1px solid #1e2030;padding-top:8px;margin-top:4px;border-radius:0">
+          <span style="font-size:10px;color:#5c5f73">... y 8 modelos mas. Click en el badge o Ctrl+M para abrir</span>
+        </div>
+      </div>
+    </div>
+    <!-- API KEY MODAL -->
+    <div class="mockup-sm">
+      <div class="head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div> API Key Personalizada</div>
+      <div class="body">
+        <div class="field"><span class="lab">URL Base</span><span class="val">https://integrate.api.nvidia.com/v1</span></div>
+        <div class="field"><span class="lab">API Key</span><span class="val">nvapi-********************</span></div>
+        <div class="field"><span class="lab">Modelo</span><span class="val">meta/llama-3.1-8b-instruct</span></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <span class="btn-mock">Guardar</span>
+          <span style="background:#1c1e26;border:1px solid #2a2d3a;border-radius:6px;padding:6px 14px;font-size:11px;color:#8b8fa3">Usar por defecto</span>
+        </div>
+        <p style="font-size:10px;color:#5c5f73;margin-top:10px">Configura cualquier proveedor compatible con OpenAI. Ideal para usar tus propias keys.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODOS -->
+<div class="container" style="margin-bottom:60px">
+  <h2 class="section-title">3 modos de trabajo</h2>
+  <p class="section-sub">Cada modo tiene un prompt especializado para distintas tareas</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">👨‍💻</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Programmer</h3>
+      <p style="font-size:12px;color:#8b8fa3;line-height:1.5">Modo por defecto. Asistente experto en reversing, memoria, debugging, parches, AOB, DLL injection y herramientas para juegos. Genera codigo completo sin restricciones.</p>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🎓</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Student</h3>
+      <p style="font-size:12px;color:#8b8fa3;line-height:1.5">Tutor especializado que explica paso a paso conceptos de memoria, procesos y reversing. Ideal para aprender y entender el codigo en detalle.</p>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:24px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">💡</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Ideas</h3>
+      <p style="font-size:12px;color:#8b8fa3;line-height:1.5">Estratega creativo para herramientas de sistema, debugging y optimizacion. Genera ideas innovadoras y codigo funcional sin limitaciones.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COMO USAR API KEY -->
+<div class="container" style="margin-bottom:60px">
+  <h2 class="section-title">🔑 Como obtener tu API Key gratis</h2>
+  <p class="section-sub">Si las claves integradas se agotan, usa tu propia key de NVIDIA</p>
+  <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:32px;max-width:700px;margin:0 auto">
+    <div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start">
+      <div style="background:rgba(0,170,255,.1);color:#00aaff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">1</div>
+      <div><strong style="font-size:14px">Ve a build.nvidia.com</strong><p style="font-size:12px;color:#8b8fa3;margin-top:2px">Abre <a href="https://build.nvidia.com" target="_blank" style="color:#00aaff">build.nvidia.com</a> en tu navegador</p></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start">
+      <div style="background:rgba(0,170,255,.1);color:#00aaff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">2</div>
+      <div><strong style="font-size:14px">Crea una cuenta gratuita</strong><p style="font-size:12px;color:#8b8fa3;margin-top:2px">Registrate con email, Google o GitHub. No requiere tarjeta de credito.</p></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start">
+      <div style="background:rgba(0,170,255,.1);color:#00aaff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">3</div>
+      <div><strong style="font-size:14px">Genera tu API Key</strong><p style="font-size:12px;color:#8b8fa3;margin-top:2px">En cualquier playground de modelo, haz click en "Get API Key" y copia el codigo que empieza con <code style="background:#0d0e12;padding:1px 5px;border-radius:3px;font-size:11px">nvapi-</code></p></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start">
+      <div style="background:rgba(0,170,255,.1);color:#00aaff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">4</div>
+      <div><strong style="font-size:14px">Pegala en MemeCraft Code</strong><p style="font-size:12px;color:#8b8fa3;margin-top:2px">Click en el boton <strong style="color:#e8eaed">🔑 API Key</strong> de la barra superior, pega tu key y guarda. Listo, sin limites.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features container" id="features">
+  <div style="grid-column:1/-1;text-align:center;margin-bottom:16px">
+    <h2 class="section-title">Todo lo que necesitas</h2>
+    <p class="section-sub">Potencia de IA sin complicaciones, enfocada en sistemas y reversing</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(0,200,100,.1);color:#00c864">🤖</div>
+    <h3>13 modelos IA</h3>
+    <p>Llama, DeepSeek, Qwen, Nemotron, Gemma, Mixtral, MiniMax, Poolside, GLM, Kimi y mas via NVIDIA NIM. Todos gratuitos.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(0,170,255,.1);color:#00aaff">🧠</div>
+    <h3>Razonamiento profundo</h3>
+    <p>Modelos con thinking mode integrado para analisis complejos de codigo, patrones AOB, offsets y estructuras de memoria.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(200,100,255,.1);color:#cc66ff">⚡</div>
+    <h3>Multi-modal</h3>
+    <p>Analiza imagenes con Llama 3.2 Vision. Arrastra capturas de pantalla, diagramas o documentos para contexto visual.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(255,180,0,.1);color:#ffb400">🔑</div>
+    <h3>API personalizada</h3>
+    <p>Conecta tu propio proveedor OpenAI-compatible. URL base + API key para usar cualquier backend.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(255,70,70,.1);color:#ff4646">💻</div>
+    <h3>Codigo completo</h3>
+    <p>La IA genera codigo COMPLETO y funcional. Sin "...", sin "resto del codigo". Cada respuesta incluye analisis detallado.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(0,200,100,.1);color:#00c864">🔄</div>
+    <h3>Auto-actualizacion</h3>
+    <p>El instalador se actualiza solo via GitHub. Las portables siempre disponibles para descarga directa.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(0,170,255,.1);color:#00aaff">⌨️</div>
+    <h3>13 atajos de teclado</h3>
+    <p>Ctrl+1 a Ctrl+[ para cambiar al instante entre los 13 modelos. Ctrl+L limpia, Ctrl+E exporta, Ctrl+Z deshace.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(200,100,255,.1);color:#cc66ff">🛠️</div>
+    <h3>Selector visual</h3>
+    <p>Modal con grid de todos los modelos, logos, descripciones, tags y shortcuts. Click en el badge de la barra superior.</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon" style="background:rgba(255,180,0,.1);color:#ffb400">📂</div>
+    <h3>Carga de proyectos</h3>
+    <p>Carga archivos y proyectos completos como contexto. Analisis con IA al instante sobre tu codigo fuente.</p>
+  </div>
+</section>
+
+<!-- MODELOS -->
+<section class="models-section" id="modelos">
+  <div class="container">
+    <h2 class="section-title">13 modelos incluidos</h2>
+    <p class="section-sub">Todos via NVIDIA NIM · Sin suscripcion · Sin limites</p>
+    <div class="models-grid">
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/meta-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Llama 3.1 8B ★</div><div class="mdesc">Rapido, recomendado</div></div>
+        <span class="mtag" style="background:rgba(0,200,100,.15);color:#00c864">Flash</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/deepseek-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">DeepSeek V4 Flash</div><div class="mdesc">Rapido, 4096 tokens</div></div>
+        <span class="mtag" style="background:rgba(0,200,100,.15);color:#00c864">Flash</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/deepseek-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">DeepSeek V4 Pro</div><div class="mdesc">Razonamiento profundo</div></div>
+        <span class="mtag" style="background:rgba(255,180,0,.15);color:#ffb400">Think</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/meta-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Llama 3.3 70B</div><div class="mdesc">Preciso, analisis profundo</div></div>
+        <span class="mtag" style="background:rgba(0,170,255,.15);color:#00aaff">Pro</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/qwen-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Qwen 3.5 397B</div><div class="mdesc">397B parametros</div></div>
+        <span class="mtag" style="background:rgba(200,100,255,.15);color:#cc66ff">Ultra</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/nvidia-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Nemotron Super 49B</div><div class="mdesc">Razonamiento avanzado</div></div>
+        <span class="mtag" style="background:rgba(255,180,0,.15);color:#ffb400">Think</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/google-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Google Gemma 3</div><div class="mdesc">Ligero y eficiente</div></div>
+        <span class="mtag" style="background:rgba(0,200,100,.15);color:#00c864">Flash</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/meta-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Llama 3.2 Vision</div><div class="mdesc">Imagenes + texto</div></div>
+        <span class="mtag" style="background:rgba(0,170,255,.15);color:#00aaff">Vision</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/mistral-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Mixtral 8x7B</div><div class="mdesc">MoE rapido</div></div>
+        <span class="mtag" style="background:rgba(0,200,100,.15);color:#00c864">MoE</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/minimax-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">MiniMax M2.7</div><div class="mdesc">Texto largo</div></div>
+        <span class="mtag" style="background:rgba(0,170,255,.15);color:#00aaff">Long</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/poolside-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Poolside Laguna</div><div class="mdesc">Codigo optimizado</div></div>
+        <span class="mtag" style="background:rgba(200,100,255,.15);color:#cc66ff">Code</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/zhipu-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">GLM 5.2</div><div class="mdesc">Razonamiento thinking</div></div>
+        <span class="mtag" style="background:rgba(255,180,0,.15);color:#ffb400">Think</span>
+      </div>
+      <div class="model-card">
+        <img class="mlogo" src="https://unpkg.com/@lobehub/icons-static-png@latest/light/kimi-color.png" alt="" loading="lazy">
+        <div class="minfo"><div class="mname">Kimi K2.6</div><div class="mdesc">Seed control</div></div>
+        <span class="mtag" style="background:rgba(0,170,255,.15);color:#00aaff">Kimi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHORTCUTS -->
+<div class="container">
+  <h2 class="section-title">Atajos de teclado</h2>
+  <p class="section-sub">Cambia de modelo al instante sin tocar el mouse</p>
+  <div class="shortcuts-showcase">
+    <div class="sc-item"><span>Llama 3.1 8B</span><span class="key">Ctrl+1</span></div>
+    <div class="sc-item"><span>DeepSeek V4 Flash</span><span class="key">Ctrl+=</span></div>
+    <div class="sc-item"><span>DeepSeek V4 Pro</span><span class="key">Ctrl+[</span></div>
+    <div class="sc-item"><span>Llama 3.3 70B</span><span class="key">Ctrl+2</span></div>
+    <div class="sc-item"><span>Qwen 3.5 397B</span><span class="key">Ctrl+3</span></div>
+    <div class="sc-item"><span>Nemotron Super</span><span class="key">Ctrl+4</span></div>
+    <div class="sc-item"><span>Gemma 3</span><span class="key">Ctrl+5</span></div>
+    <div class="sc-item"><span>Llama Vision</span><span class="key">Ctrl+6</span></div>
+    <div class="sc-item"><span>Mixtral 8x7B</span><span class="key">Ctrl+7</span></div>
+    <div class="sc-item"><span>MiniMax M2.7</span><span class="key">Ctrl+8</span></div>
+    <div class="sc-item"><span>Poolside Laguna</span><span class="key">Ctrl+9</span></div>
+    <div class="sc-item"><span>GLM 5.2</span><span class="key">Ctrl+0</span></div>
+    <div class="sc-item"><span>Kimi K2.6</span><span class="key">Ctrl+-</span></div>
+  </div>
+</div>
+
+<!-- DESCARGAS -->
+<section class="download-section container" id="descargas">
+  <h2 class="section-title">Descargar MemeCraft Code</h2>
+  <p class="section-sub">Gratis · Open source · Sin publicidad ni tracking</p>
+  <div class="download-grid">
+    <div class="dl-card">
+      <div class="os-icon">📦</div>
+      <h3>Portable (.exe)</h3>
+      <p>Version autonoma. No requiere instalacion. Descarga y ejecuta al instante desde cualquier carpeta.</p>
+      <div class="meta">~75 MB · Windows 10+ · x64</div>
+      <a href="https://github.com/bddjf00-cell/MemecraftIA/releases/download/v1.0.23/MemeCraft-Code-1.0.23-portable.exe" class="btn-primary" target="_blank">⬇ Descargar Portable</a>
+    </div>
+    <div class="dl-card">
+      <div class="os-icon">⚙️</div>
+      <h3>Instalador (.exe)</h3>
+      <p>Instalador oficial. Incluye acceso directo en el escritorio, menu inicio y auto-actualizacion via GitHub.</p>
+      <div class="meta">~75 MB · Windows 10+ · x64</div>
+      <a href="https://github.com/bddjf00-cell/MemecraftIA/releases/download/v1.0.23/MemeCraft-Code-1.0.23-Setup.exe" class="btn-primary" target="_blank">⬇ Descargar Instalador</a>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:24px">
+    <p style="color:#5c5f73;font-size:13px">Codigo fuente en <a href="https://github.com/bddjf00-cell/MemecraftIA" target="_blank">GitHub</a> · Licencia MIT</p>
+  </div>
+</section>
+
+<!-- COMO INSTALAR -->
+<div class="container" style="margin-bottom:60px">
+  <h2 class="section-title">Como instalar</h2>
+  <p class="section-sub">Dos formas de usar MemeCraft Code en tu PC</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px">
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:28px">
+      <div style="font-size:28px;margin-bottom:12px">📦</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">Version Portable</h3>
+      <ol style="font-size:13px;color:#8b8fa3;line-height:1.8;padding-left:20px">
+        <li>Descarga <strong style="color:#e8eaed">MemeCraft-Code-1.0.23-portable.exe</strong></li>
+        <li>Guardalo en cualquier carpeta (escritorio, USB, etc.)</li>
+        <li>Haz doble clic en el .exe para ejecutar</li>
+        <li>No necesita instalacion, no modifica el registro</li>
+        <li>Para actualizar: descarga la nueva version y reemplaza el .exe</li>
+      </ol>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:28px">
+      <div style="font-size:28px;margin-bottom:12px">⚙️</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">Version Instalador</h3>
+      <ol style="font-size:13px;color:#8b8fa3;line-height:1.8;padding-left:20px">
+        <li>Descarga <strong style="color:#e8eaed">MemeCraft-Code-1.0.23-Setup.exe</strong></li>
+        <li>Ejecuta el instalador y sigue los pasos</li>
+        <li>Elige carpeta de instalacion (o deja la default)</li>
+        <li>Se crea acceso directo en el escritorio y menu inicio</li>
+        <li>Se actualiza automaticamente cuando hay nuevas versiones</li>
+      </ol>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px">
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:28px">
+      <div style="font-size:28px;margin-bottom:12px">🔑</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">Primer uso</h3>
+      <ol style="font-size:13px;color:#8b8fa3;line-height:1.8;padding-left:20px">
+        <li>Al abrir el app, escribe un mensaje y presiona Enter</li>
+        <li>Si las claves integradas fallan, haz clic en <strong style="color:#e8eaed">API Key</strong> (arriba a la derecha)</li>
+        <li>Presiona <strong style="color:#e8eaed">Probar</strong> para verificar si la API responde</li>
+        <li>Si no funciona, genera tu key gratis en <a href="https://build.nvidia.com" target="_blank" style="color:#00aaff">build.nvidia.com</a></li>
+        <li>Pega tu API Key y guarda — listo para usar</li>
+      </ol>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:12px;padding:28px">
+      <div style="font-size:28px;margin-bottom:12px">⌨️</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">Atajos rapidos</h3>
+      <ol style="font-size:13px;color:#8b8fa3;line-height:1.8;padding-left:20px">
+        <li><strong style="color:#e8eaed">Enter</strong> — Enviar mensaje</li>
+        <li><strong style="color:#e8eaed">Ctrl+1</strong> a <strong style="color:#e8eaed">Ctrl+0</strong> — Cambiar modelo</li>
+        <li><strong style="color:#e8eaed">Ctrl+L</strong> — Limpiar chat</li>
+        <li><strong style="color:#e8eaed">Ctrl+E</strong> — Exportar a TXT</li>
+        <li><strong style="color:#e8eaed">Ctrl+F</strong> — Buscar en el chat</li>
+        <li><strong style="color:#e8eaed">Ctrl+Z</strong> — Deshacer ultimo envio</li>
+        <li><strong style="color:#e8eaed">?</strong> — Ver todos los atajos</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGELOG -->
+<div class="container">
+  <div class="changelog">
+    <h3>📋 Novedades</h3>
+    <ul>
+      <li><span class="ver">v1.0.23</span> DeepSeek V4 Flash y Pro añadidos (13 modelos). Icono Kimi corregido. Nuevo selector modal con grid completo.</li>
+      <li><span class="ver">v1.0.22</span> 5 modelos nuevos: Mixtral, MiniMax, Poolside, GLM 5.2, Kimi K2.6. API personalizada URL + Key. Codigo completo sin omisiones.</li>
+      <li><span class="ver">v1.0.21</span> Nuevos modelos Gemma 3, Llama Vision. Selector de modelos integrado. Atajos de teclado extendidos.</li>
+      <li><span class="ver">v1.0.20</span> Modal API Key. Streaming en tiempo real. Modos Programmer, Student, Ideas.</li>
+      <li><span class="ver">v1.0.19</span> Modelos con thinking mode. Qwen 3.5 397B y Nemotron Super 49B añadidos.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="container" style="margin-bottom:60px">
+  <h2 class="section-title">Preguntas frecuentes</h2>
+  <p class="section-sub">Todo lo que necesitas saber sobre MemeCraft Code</p>
+  <div style="max-width:700px;margin:0 auto">
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:10px;padding:20px;margin-bottom:10px">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:4px">¿Es completamente gratis?</h4>
+      <p style="font-size:12px;color:#8b8fa3">Si. El app es open source y las claves integradas de NVIDIA NIM son gratuitas. Si se agotan, puedes generar tu propia API Key gratis en build.nvidia.com.</p>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:10px;padding:20px;margin-bottom:10px">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:4px">¿Que modelos incluye?</h4>
+      <p style="font-size:12px;color:#8b8fa3">13 modelos: Llama 3.1 8B, DeepSeek V4 Flash, DeepSeek V4 Pro, Llama 3.3 70B, Qwen 3.5 397B, Nemotron Super 49B, Gemma 3, Llama Vision, Mixtral 8x7B, MiniMax M2.7, Poolside Laguna, GLM 5.2 y Kimi K2.6.</p>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:10px;padding:20px;margin-bottom:10px">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:4px">¿Puedo usar mi propio proveedor de IA?</h4>
+      <p style="font-size:12px;color:#8b8fa3">Si. El boton 🔑 API Key te permite configurar cualquier URL base y API key compatible con OpenAI (OpenAI, Anthropic, Groq, Together, Azure, etc).</p>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:10px;padding:20px;margin-bottom:10px">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:4px">¿Como me actualizo?</h4>
+      <p style="font-size:12px;color:#8b8fa3">El instalador (Setup.exe) se actualiza automaticamente via GitHub. La version portable necesitas descargar la nueva version manualmente.</p>
+    </div>
+    <div style="background:#111318;border:1px solid #1e2030;border-radius:10px;padding:20px;margin-bottom:10px">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:4px">¿Donde reporto bugs o sugiero mejoras?</h4>
+      <p style="font-size:12px;color:#8b8fa3">En el repositorio de GitHub: <a href="https://github.com/bddjf00-cell/MemecraftIA/issues" target="_blank" style="color:#00aaff">github.com/bddjf00-cell/MemecraftIA/issues</a></p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="social">
+    <a href="https://github.com/bddjf00-cell/MemecraftIA" target="_blank">GitHub</a>
+    <a href="descargas.html">Pagina oficial</a>
+    <a href="https://github.com/bddjf00-cell/MemecraftIA/releases" target="_blank">Releases</a>
+  </div>
+  <p>MemeCraft Code · Proyecto open source · Hecho con ❤️</p>
+  <p style="margin-top:6px">No afiliado con Meta, NVIDIA, Google, DeepSeek ni otras marcas mencionadas</p>
+</footer>
+
+</body>
+</html>

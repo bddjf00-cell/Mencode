@@ -1,0 +1,60 @@
+{
+  "name": "memecraft-code",
+  "version": "1.0.23",
+  "description": "MemeCraft Code - Asistente de codigo con IA",
+  "author": "MemeCraft",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:portable": "electron-builder --win portable",
+    "build:installer": "electron-builder --win nsis",
+    "build:all": "electron-builder --win nsis portable",
+    "publish": "electron-builder --win nsis --publish always"
+  },
+  "build": {
+    "appId": "com.memecraft.code",
+    "productName": "MemeCraft Code",
+    "directories": {
+      "output": "dist-installer"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "Imagenes/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MemeCraft Code",
+      "artifactName": "MemeCraft-Code-${version}-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "MemeCraft-Code-${version}-portable.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "bddjf00-cell",
+      "repo": "MemecraftIA",
+      "releaseType": "release"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "^6.0.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}
